@@ -75,31 +75,66 @@ class PixelMap:
             tuple(tuple(TRANSPARENT for _ in range(width)) for _ in range(height)),
         )
 
-    def outline(self, width: int, color: str) -> "PixelMap":
+    def outline(self, width: int, color: str, create_inwards: bool = False) -> "PixelMap":
         if width < 1:
             return self
 
         outline_color = hex_to_rgba(color)
-        expanded = self.pad(width)
-        mask = {
-            (x + width, y + width)
-            for y, row in enumerate(self.pixels)
-            for x, pixel in enumerate(row)
-            if pixel[3] > 0
-        }
-        outlined = [list(row) for row in expanded.pixels]
+        
+        if not create_inwards:
+            # Outline hacia afuera (expande el canvas)
+            expanded = self.pad(width)
+            mask = {
+                (x + width, y + width)
+                for y, row in enumerate(self.pixels)
+                for x, pixel in enumerate(row)
+                if pixel[3] > 0
+            }
+            outlined = [list(row) for row in expanded.pixels]
 
-        for x, y in mask:
-            for outline_y in range(y - width, y + width + 1):
-                for outline_x in range(x - width, x + width + 1):
-                    if (outline_x, outline_y) in mask:
-                        continue
-                    if not (0 <= outline_x < expanded.width and 0 <= outline_y < expanded.height):
-                        continue
-                    if outlined[outline_y][outline_x][3] == 0:
-                        outlined[outline_y][outline_x] = outline_color
+            for x, y in mask:
+                for outline_y in range(y - width, y + width + 1):
+                    for outline_x in range(x - width, x + width + 1):
+                        if (outline_x, outline_y) in mask:
+                            continue
+                        if not (0 <= outline_x < expanded.width and 0 <= outline_y < expanded.height):
+                            continue
+                        if outlined[outline_y][outline_x][3] == 0:
+                            outlined[outline_y][outline_x] = outline_color
 
-        return PixelMap(expanded.width, expanded.height, tuple(tuple(row) for row in outlined), name=self.name, canvas_size=self.canvas_size)
+            return PixelMap(expanded.width, expanded.height, tuple(tuple(row) for row in outlined), name=self.name, canvas_size=self.canvas_size)
+        else:
+            # Outline hacia adentro (pinta los bordes del icono)
+            canvas = [list(row) for row in self.pixels]
+            mask = {
+                (x, y)
+                for y, row in enumerate(self.pixels)
+                for x, pixel in enumerate(row)
+                if pixel[3] > 0
+            }
+            
+            # Encuentra píxeles del icono que están en los bordes (cercanos a transparencia)
+            edge_pixels = set()
+            for x, y in mask:
+                is_edge = False
+                for offset_y in range(-width, width + 1):
+                    for offset_x in range(-width, width + 1):
+                        check_x = x + offset_x
+                        check_y = y + offset_y
+                        if (check_x, check_y) not in mask:
+                            if 0 <= check_x < self.width and 0 <= check_y < self.height:
+                                is_edge = True
+                                break
+                    if is_edge:
+                        break
+                if is_edge:
+                    edge_pixels.add((x, y))
+            
+            # Pinta los píxeles del borde con el color del outline
+            for x, y in edge_pixels:
+                canvas[y][x] = outline_color
+
+            return PixelMap(self.width, self.height, tuple(tuple(row) for row in canvas), name=self.name, canvas_size=self.canvas_size)
 
     def pad(self, size: int) -> "PixelMap":
         padded = PixelMap.empty(self.width + size * 2, self.height + size * 2)
@@ -283,3 +318,18 @@ def generate_previews(
 def export_pixel_maps(pixel_maps: list[PixelMap], output_path: str | Path) -> None:
     for pixel_map in pixel_maps:
         pixel_map.export(output_path=output_path)
+
+def combine_pixel_maps(
+    pixel_maps: list[PixelMap],
+    position: tuple[int, int] | str = "center",
+    offset: tuple[int, int] = (0, 0),
+    name: str | None = None,
+) -> PixelMap:
+    if not pixel_maps:
+        raise ValueError("Cannot combine an empty list of pixel maps")
+
+    combined = pixel_maps[0]
+    for pixel_map in pixel_maps[1:]:
+        combined = combined.combine_pixel_map(pixel_map, position, offset=offset, zindex=1)
+
+    return PixelMap(combined.width, combined.height, combined.pixels, name=name or combined.name, canvas_size=combined.canvas_size)

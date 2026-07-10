@@ -7,6 +7,8 @@ from graphics import t2_indicator, t3_indicator
 original_icons_dir = Path(__file__).with_name("original_icons")
 FAF_ICON_SIZE = (12, 16)
 FAF_SELECTED_ICON_SIZE = (16, 20)
+FAF_LARGE_ICON_SIZE = (16, 20)
+FAF_LARGE_SELECTED_ICON_SIZE = (20, 24)
 
 
 def _get_visible_span(icon: PixelMap, y: int) -> tuple[int, int] | None:
@@ -53,12 +55,20 @@ def _remove_native_t1_marker(icon: PixelMap) -> PixelMap:
 def create_faf_icon_variants(
     icon: PixelMap,
     techs: list[int],
+    canvas_size: tuple[int, int] = FAF_ICON_SIZE,
+    selected_canvas_size: tuple[int, int] = FAF_SELECTED_ICON_SIZE,
+    add_border: bool = True,
 ) -> list[PixelMap]:
     icon_states = []
-    icon_states.append(icon.outline(1, black).add_suffix_to_the_name("_rest").set_canvas_size(FAF_ICON_SIZE))
-    icon_states.append(icon.outline(1, player_color).add_suffix_to_the_name("_over").set_canvas_size(FAF_ICON_SIZE))
-    icon_states.append(icon.outline(2, white).add_suffix_to_the_name("_selected").set_canvas_size(FAF_SELECTED_ICON_SIZE))
-    icon_states.append(icon.outline(2, player_color).add_suffix_to_the_name("_selectedover").set_canvas_size(FAF_SELECTED_ICON_SIZE))
+    create_border_inwards = not add_border
+    
+    if add_border:
+        icon_states.append(icon.outline(1, black, create_inwards=add_border).add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
+    else:
+        icon_states.append(icon.add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
+    icon_states.append(icon.outline(1, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_over").set_canvas_size(canvas_size))
+    icon_states.append(icon.outline(2, white, create_inwards=create_border_inwards).add_suffix_to_the_name("_selected").set_canvas_size(selected_canvas_size))
+    icon_states.append(icon.outline(2, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_selectedover").set_canvas_size(selected_canvas_size))
 
     variants = []
     for icon_state in icon_states:
