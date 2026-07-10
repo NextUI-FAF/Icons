@@ -1,14 +1,42 @@
+from dataclasses import dataclass
 from pathlib import Path
-
-from pixelmap import PixelMap
-from colors import black, player_color, white
+from colors import (
+    FAF_PLAYER_COLORS,
+    black,
+    hex_to_rgba,
+    player_color,
+    white,
+    slate_bright
+)
+from pixelmap import PixelMap, combine_pixel_maps, generate_previews, generate_pixelmap_preview_gallery
 from graphics import t2_indicator, t3_indicator
 
 original_icons_dir = Path(__file__).with_name("original_icons")
+previews_dir = Path(__file__).with_name("previews")
 FAF_ICON_SIZE = (12, 16)
 FAF_SELECTED_ICON_SIZE = (16, 20)
 FAF_LARGE_ICON_SIZE = (16, 20)
 FAF_LARGE_SELECTED_ICON_SIZE = (20, 24)
+player_colors_quantity = len(FAF_PLAYER_COLORS)
+
+
+@dataclass(frozen=True)
+class FafCanvas:
+    rest: tuple[int, int]
+    selected: tuple[int, int]
+
+
+NORMAL_FAF_CANVAS = FafCanvas(
+    rest=FAF_ICON_SIZE,
+    selected=FAF_SELECTED_ICON_SIZE,
+)
+LARGE_FAF_CANVAS = FafCanvas(
+    rest=FAF_LARGE_ICON_SIZE,
+    selected=FAF_LARGE_SELECTED_ICON_SIZE,
+)
+
+composed_faf_icons: list[PixelMap] = []
+composed_faf_rest_colored_icons: list[PixelMap] = []
 
 
 def _get_visible_span(icon: PixelMap, y: int) -> tuple[int, int] | None:
@@ -51,8 +79,42 @@ def _remove_native_t1_marker(icon: PixelMap) -> PixelMap:
 
     return icon.erase_rect(0, marker_top, icon.width, icon.height - marker_top)
 
+def compose_faf_icon_with_variants(icons: list[PixelMap],
+                                   name: str,
+                                   techs: list[int],
+                                   border_inwards: bool = False,
+                                   canvas: FafCanvas = NORMAL_FAF_CANVAS,
+                                   ) -> list[PixelMap]:
+    pixel_map = combine_pixel_maps(icons,  name=name)
+    faf_icon_with_variants = generate_faf_icon_variants(
+        pixel_map,
+        techs,
+        canvas_size=canvas.rest,
+        selected_canvas_size=canvas.selected,
+        create_border_inwards=border_inwards,
+    )
+    composed_faf_icons.extend(faf_icon_with_variants)
+    return faf_icon_with_variants
 
-def create_faf_icon_variants(
+def generate_faf_icons_previews(output_dir: Path = previews_dir, preview_gallery_background_color="#303030") -> None:
+    generate_previews(composed_faf_icons, output_dir)
+    colored_icon_columns = len(composed_faf_rest_colored_icons) // player_colors_quantity
+    generate_pixelmap_preview_gallery(
+        composed_faf_rest_colored_icons,
+        filename=output_dir / "gallery_custom_colored_icons.png",
+        rows=player_colors_quantity,
+        columns=colored_icon_columns,
+        arrange="top-to-bottom",
+        background_color=preview_gallery_background_color,
+        vertical_spacing=8,
+        horizontal_spacing=6
+    )
+
+def export_faf_icons_with_variants(output_dir: Path) -> None:
+    for icon in composed_faf_icons:
+        icon.export(output_path=output_dir)
+
+def generate_faf_icon_variants(
     icon: PixelMap,
     techs: list[int],
     canvas_size: tuple[int, int] = FAF_ICON_SIZE,
@@ -65,6 +127,9 @@ def create_faf_icon_variants(
         icon_states.append(icon.outline(1, black).add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
     else:
         icon_states.append(icon.add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
+    composed_faf_rest_colored_icons.extend(
+        generate_faf_icons_with_player_color_variants(icon_states[0])
+    )
     icon_states.append(icon.outline(1, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_over").set_canvas_size(canvas_size))
     icon_states.append(icon.outline(2, white, create_inwards=create_border_inwards).add_suffix_to_the_name("_selected").set_canvas_size(selected_canvas_size))
     icon_states.append(icon.outline(2, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_selectedover").set_canvas_size(selected_canvas_size))
@@ -94,8 +159,44 @@ def load_original_faf_icons_as_pixel_maps(tech: int | str = "") -> list[PixelMap
 
 def create_t1_icons_without_tech_marker() -> list[PixelMap]:
     icons = []
-
     for original_icon in load_original_faf_icons_as_pixel_maps(tech=1):
         icons.append(_remove_native_t1_marker(original_icon))
-
+    composed_faf_icons.extend(icons)
     return icons
+
+def generate_faf_icons_with_player_color_variants(
+    pixel_map: PixelMap,
+) -> list[PixelMap]:
+    player_rgb = hex_to_rgba(player_color)[:3]
+    variants = []
+
+    for color_name, color in FAF_PLAYER_COLORS.items():
+        replacement_rgb = hex_to_rgba(color)[:3]
+
+        pixels = tuple(
+            tuple(
+                (*replacement_rgb, pixel[3])
+                if pixel[:3] == player_rgb
+                else pixel
+                for pixel in row
+            )
+            for row in pixel_map.pixels
+        )
+
+        variant_name = (
+            f"{pixel_map.name}_{color_name}"
+            if pixel_map.name is not None
+            else color_name
+        )
+
+        variants.append(
+            PixelMap(
+                width=pixel_map.width,
+                height=pixel_map.height,
+                pixels=pixels,
+                name=variant_name,
+                canvas_size=pixel_map.canvas_size,
+            )
+        )
+
+    return variants

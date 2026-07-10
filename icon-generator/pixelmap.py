@@ -1,4 +1,5 @@
-from typing import Iterable
+from math import ceil
+from typing import Iterable, Literal
 from dataclasses import dataclass
 from colors import *
 from dds import save_argb8888_dds, save_dxt5_dds
@@ -351,6 +352,93 @@ def generate_previews(
 ) -> None:
     for pixel_map in pixel_maps:
         pixel_map.generate_preview(preview_path=preview_path, scale=scale)
+
+
+def generate_pixelmap_gallery(
+    pixel_maps: list[PixelMap],
+    *,
+    columns: int,
+    rows: int | None = None,
+    arrange: Literal["left-to-right", "top-to-bottom"] = "left-to-right",
+    horizontal_spacing: int = 1,
+    vertical_spacing: int = 1,
+    background_color: str | None = None,
+    name: str = "pixelmap-gallery",
+) -> PixelMap:
+    """Arrange pixel maps in a row-first or column-first gallery."""
+    if not pixel_maps:
+        raise ValueError("Cannot generate a gallery without pixel maps")
+    if columns < 1:
+        raise ValueError("Gallery columns must be at least 1")
+    if rows is not None and rows < 1:
+        raise ValueError("Gallery rows must be at least 1")
+    if horizontal_spacing < 0 or vertical_spacing < 0:
+        raise ValueError("Gallery spacing cannot be negative")
+    if arrange not in {"left-to-right", "top-to-bottom"}:
+        raise ValueError(
+            "Gallery arrange must be 'left-to-right' or 'top-to-bottom'"
+        )
+
+    gallery_rows = rows if rows is not None else ceil(len(pixel_maps) / columns)
+    capacity = columns * gallery_rows
+    if capacity < len(pixel_maps):
+        raise ValueError(
+            f"The gallery has space for {capacity} pixel maps, "
+            f"but {len(pixel_maps)} were provided"
+        )
+
+    cell_width = max(pixel_map.width for pixel_map in pixel_maps)
+    cell_height = max(pixel_map.height for pixel_map in pixel_maps)
+    gallery_width = columns * cell_width + (columns - 1) * horizontal_spacing
+    gallery_height = gallery_rows * cell_height + (gallery_rows - 1) * vertical_spacing
+    gallery = (
+        PixelMap.empty(gallery_width, gallery_height)
+        if background_color is None
+        else PixelMap.fill(gallery_width, gallery_height, background_color)
+    )
+
+    for index, pixel_map in enumerate(pixel_maps):
+        if arrange == "left-to-right":
+            row, column = divmod(index, columns)
+        else:
+            column, row = divmod(index, gallery_rows)
+        cell_x = column * (cell_width + horizontal_spacing)
+        cell_y = row * (cell_height + vertical_spacing)
+        icon_x = cell_x + (cell_width - pixel_map.width) // 2
+        icon_y = cell_y + (cell_height - pixel_map.height) // 2
+        gallery = gallery.combine_pixel_map(pixel_map, (icon_x, icon_y))
+
+    return PixelMap(
+        gallery.width,
+        gallery.height,
+        gallery.pixels,
+        name=name,
+    )
+
+
+def generate_pixelmap_preview_gallery(
+    pixel_maps: list[PixelMap],
+    filename: str | Path,
+    *,
+    columns: int,
+    rows: int | None = None,
+    arrange: Literal["left-to-right", "top-to-bottom"] = "left-to-right",
+    horizontal_spacing: int = 1,
+    vertical_spacing: int = 1,
+    background_color: str | None = None,
+    scale: int = 4,
+) -> None:
+    """Generate a PNG preview containing a grid of pixel maps."""
+    gallery = generate_pixelmap_gallery(
+        pixel_maps,
+        columns=columns,
+        rows=rows,
+        arrange=arrange,
+        horizontal_spacing=horizontal_spacing,
+        vertical_spacing=vertical_spacing,
+        background_color=background_color,
+    )
+    gallery.generate_preview(filename=str(filename), scale=scale)
 
 
 def export_pixel_maps(

@@ -5,28 +5,42 @@ player_color = "#7b7d7b"
 # These colors are safe for strategic icon symbols in the tested layouts.
 black = "#000000" # SI Funciona
 white = "#ffffff" # SI Funciona
-yellow = "#ffff33" # SI Funciona
-green = "#4dff70" # SI Funciona
-green_clear = "#bffcff"  # SI Funciona
-blue_light = "#27d9ff" # SI Funciona
 blue_tactical_navy = "#051C33" # SI funciona, pero se pierde un poco de detalle por ser casi negro
+silver_bright = "#c9d2dc"     # Gris metálico claro
 red_signal = "#ff4d57"
+red_bright = "#ff3855"
+red_orange = "#ff594d"
 coral_warning = "#ff6b57"
 orange_safety = "#ff9f43"
+peach_bright = "#ffad80"
+yellow = "#ffff33" # SI Funciona
 gold_bright = "#ffd84d"
+amber_signal = "#ffbf24"      # Ámbar; más cálido y oscuro que yellow/gold - Es posible que no funcione, veo 2 pixeles manchados
+ochre_bright = "#dba82b"      # Ocre metálico, útil para recursos o veterancy
+sand_bright = "#e8cf91"       # Arena/beige, útil como tono neutral cálido
+green = "#4dff70" # SI Funciona
 lime_energy = "#b8ff4d"
 green_neon = "#39ff88"
 mint_bright = "#66ffd1"
 turquoise_bright = "#33e6c4"
 cyan_ice = "#66f2ff"
+cyan_pale = "#bffcff"  # SI Funciona
+blue_light = "#27d9ff" # SI Funciona
 blue_electric = "#4d9dff"
-pink_signal = "#ff5ccf"
+indigo_bright = "#6670ff"     # Transición azul-violeta claramente reconocible
+periwinkle = "#91a1ff"        # Azul lavanda suave, pero visible
+pink_signal = "#ff5cce"
+violet_electric = "#9d5cff"   # Violeta intenso; muy distinto de azul y rosa
+purple_bright = "#c45cff"     # Morado luminoso
+magenta_vivid = "#f238ff"     # Magenta puro; más violeta que pink_signal
+lavender_bright = "#c7a6ff"   # Lavanda clara y legible
+
+
+
 
 # DXT5 candidates for the next in-game test pass. These stay close to color
 # families that already work, while exploring additional useful shades.
-red_bright = "#ff3855"
-red_orange = "#ff594d"
-peach_bright = "#ffad80"
+copper_bright = "#d98245"     # Cobre; diferente de naranja y coral
 orange_bright = "#ffb347"
 yellow_soft = "#fff066"
 chartreuse_bright = "#c8ff57"
@@ -53,6 +67,8 @@ magenta = "#ff00ff"# No sirve, mancha algunos pixeles que deberian ser del color
 cyan = "#00ffff" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
 blue_cobalt_defense = "#00ACFF" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
 violet_energy = "#a66bff" # No sirve en DXT5; el simbolo toma el color del jugador
+gray_neutral = "#8793a1"      # Gris medio azulado - No sirvio, se pinto del color del jugador
+slate_bright = "#64788c"      # Pizarra; neutral frío sin llegar a casi negro - No sirvio, se pinto del color del jugador
 
 # FAF player colors from /lua/GameColors.lua.
 # Do not use these for strategic icon symbols: they are actual player colors,
