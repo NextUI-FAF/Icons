@@ -1,4 +1,5 @@
 from math import ceil
+from collections.abc import Mapping
 from typing import Iterable, Literal
 from dataclasses import dataclass
 from colors import *
@@ -8,49 +9,76 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
+class PixelPattern:
+    width: int
+    height: int
+    points: tuple[tuple[str | None, ...], ...]
+
+    @classmethod
+    def from_text(
+        cls,
+        points: str,
+        *,
+        transparent_tokens: Iterable[str] = ("X", ".", "_"),
+    ) -> "PixelPattern":
+        rows = [
+            [token.strip() for token in line.split()]
+            for line in points.strip().splitlines()
+            if line.strip()
+        ]
+        if not rows:
+            raise ValueError("Pixel pattern cannot be empty")
+
+        width = len(rows[0])
+        if any(len(row) != width for row in rows):
+            raise ValueError("All pixel-pattern rows must have the same width")
+
+        transparent = set(transparent_tokens)
+        parsed_rows = tuple(
+            tuple(None if token in transparent else token for token in row)
+            for row in rows
+        )
+        return cls(width, len(parsed_rows), parsed_rows)
+
+    @classmethod
+    def fill(cls, width: int, height: int) -> "PixelPattern":
+        if width < 1 or height < 1:
+            raise ValueError("Pixel pattern dimensions must be positive")
+        return cls(width, height, tuple(tuple("A" for _ in range(width)) for _ in range(height)))
+
+    def color(self, colors: Mapping[str, str], *, name: str) -> "PixelMap":
+        if not name.strip():
+            raise ValueError("A colored PixelMap must have a non-empty name")
+
+        required_tokens = {
+            token
+            for row in self.points
+            for token in row
+            if token is not None
+        }
+        provided_tokens = set(colors)
+        missing = required_tokens - provided_tokens
+        unknown = provided_tokens - required_tokens
+        if missing:
+            raise ValueError(f"Missing colors for pattern tokens: {', '.join(sorted(missing))}")
+        if unknown:
+            raise ValueError(f"Unknown colors for pattern tokens: {', '.join(sorted(unknown))}")
+
+        palette = {token: hex_to_rgba(color) for token, color in colors.items()}
+        pixels = tuple(
+            tuple(TRANSPARENT if token is None else palette[token] for token in row)
+            for row in self.points
+        )
+        return PixelMap(self.width, self.height, pixels, name=name)
+
+
+@dataclass(frozen=True)
 class PixelMap:
     width: int
     height: int
     pixels: tuple[tuple[tuple[int, int, int, int], ...], ...]
     name: str | None = None
     canvas_size: tuple[int, int] | None = None
-
-    @classmethod
-    def from_text(
-        cls,
-        pixels: str,
-        colors: dict[str, str],
-        *,
-        transparent_tokens: Iterable[str] = ("X", ".", "_"),
-        name: str | None = None,
-    ) -> "PixelMap":
-        rows = [
-            [token.strip() for token in line.split()]
-            for line in pixels.strip().splitlines()
-            if line.strip()
-        ]
-        if not rows:
-            raise ValueError("Pixel map cannot be empty")
-
-        width = len(rows[0])
-        if any(len(row) != width for row in rows):
-            raise ValueError("All pixel-map rows must have the same width")
-
-        transparent = set(transparent_tokens)
-        palette = {key: hex_to_rgba(value) for key, value in colors.items()}
-        parsed_rows = []
-        for row in rows:
-            parsed_row = []
-            for token in row:
-                if token in transparent:
-                    parsed_row.append(TRANSPARENT)
-                    continue
-                if token not in palette:
-                    raise ValueError(f"Token {token!r} is missing from the color map")
-                parsed_row.append(palette[token])
-            parsed_rows.append(tuple(parsed_row))
-
-        return cls(width, len(parsed_rows), tuple(parsed_rows), name=name)
 
     @classmethod
     def fill(cls, width: int, height: int, color: str, *, name: str | None = None) -> "PixelMap":
