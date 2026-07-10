@@ -1,27 +1,58 @@
 # el juego remplaza este color por el color del jugador
 player_color = "#7b7d7b"
 
+# Working colors with DXT5 compression, tested in-game.
+# These colors are safe for strategic icon symbols in the tested layouts.
 black = "#000000" # SI Funciona
 white = "#ffffff" # SI Funciona
 yellow = "#ffff33" # SI Funciona
+green = "#4dff70" # SI Funciona
+green_clear = "#bffcff"  # SI Funciona
+blue_light = "#27d9ff" # SI Funciona
+blue_tactical_navy = "#051C33" # SI funciona, pero se pierde un poco de detalle por ser casi negro
+red_signal = "#ff4d57"
+coral_warning = "#ff6b57"
+orange_safety = "#ff9f43"
+gold_bright = "#ffd84d"
+lime_energy = "#b8ff4d"
+green_neon = "#39ff88"
+mint_bright = "#66ffd1"
+turquoise_bright = "#33e6c4"
+cyan_ice = "#66f2ff"
+blue_electric = "#4d9dff"
+pink_signal = "#ff5ccf"
+
+# DXT5 candidates for the next in-game test pass. These stay close to color
+# families that already work, while exploring additional useful shades.
+red_bright = "#ff3855"
+red_orange = "#ff594d"
+peach_bright = "#ffad80"
+orange_bright = "#ffb347"
+yellow_soft = "#fff066"
+chartreuse_bright = "#c8ff57"
+green_spring = "#57ff7a"
+emerald_bright = "#4dff9a"
+seafoam_bright = "#8affd1"
+teal_neon = "#33ffd6"
+sky_bright = "#66d9ff"
+blue_ice = "#8abfff"
+rose_bright = "#ff6ba8"
+pink_soft = "#ff8fd8"
+
+# Los siguientes colores no sirven para los simbolos de los iconos ya que manchan
+# algunos pixeles que deberian ser del color del jugador, pero tal vez funcionan bien para los detalles de
+# de los bordes gruesos que estan separados del centro del icono gracias a una linea negra que los separa
+# del color del jugador
 pure_yellow = "#ffff00" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
 amber_tactical = "#D97706" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
-green = "#4dff70" # SI Funciona
 green_pure = "#00ff00" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
-green_clear = "#bffcff"  # SI Funciona
 green_tactical_olive = "#4A5320" # No sirve, lo pinta del color del jugador completamente
 green_militar = "#5D6532" # No sirve, lo pinta del color del jugador completamente
 orange = "#ff8a00" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
-red = "#ff3030"
 magenta = "#ff00ff"# No sirve, mancha algunos pixeles que deberian ser del color del jugador
 cyan = "#00ffff" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
-blue_light = "#27d9ff" # SI Funciona
 blue_cobalt_defense = "#00ACFF" # No sirve, mancha algunos pixeles que deberian ser del color del jugador
-blue_tactical_navy = "#051C33" # SI funciona, pero se pierde un poco de detalle por ser casi negro
-
-# Los siguientes colores no sirven para los simbolos de los iconos ya que manchan 
-# algunos pixeles que deberian ser del color del jugador, pero funcionan bien para los detalles de 
-# de los bordes gruesos que estan separados del centro del icono como 
+violet_energy = "#a66bff" # No sirve en DXT5; el simbolo toma el color del jugador
 
 # FAF player colors from /lua/GameColors.lua.
 # Do not use these for strategic icon symbols: they are actual player colors,

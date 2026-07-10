@@ -34,15 +34,15 @@ def create_custom_icons() -> list[PixelMap]:
 
     tml_icon = square.combine_pixel_map(corners_yellow_border, "center")
     tml_icon = tml_icon.combine_pixel_map(missile_symbol_outlined, "center", name="icon_structure[T]_missile")
-    icons.extend(create_faf_icon_variants(tml_icon, [2], (13, 17), create_border_inwards=True))
+    icons.extend(create_faf_icon_variants(tml_icon, [2], canvas_size=(16, 20), selected_canvas_size=(16, 20), create_border_inwards=True))
 
     sml_icon = hazard_warning_border.combine_pixel_map(square_big, "center")
     sml_icon = sml_icon.combine_pixel_map(sml_symbol_outlined, "center", name="icon_structure[T]_missile")
-    icons.extend(create_faf_icon_variants(sml_icon, [3], FAF_LARGE_ICON_SIZE, FAF_LARGE_SELECTED_ICON_SIZE, create_border_inwards=True))
+    icons.extend(create_faf_icon_variants(sml_icon, [3], canvas_size=FAF_LARGE_ICON_SIZE, selected_canvas_size=FAF_LARGE_SELECTED_ICON_SIZE, create_border_inwards=True))
 
     artillery_icon = hazard_warning_border.combine_pixel_map(square_big, "center")
     artillery_icon = artillery_icon.combine_pixel_map(artillery_symbol_outlined, "center", name="icon_structure[T]_artillery")
-    icons.extend(create_faf_icon_variants(artillery_icon, [3], FAF_LARGE_ICON_SIZE, FAF_LARGE_SELECTED_ICON_SIZE, create_border_inwards=True))
+    icons.extend(create_faf_icon_variants(artillery_icon, [3], canvas_size=FAF_LARGE_ICON_SIZE, selected_canvas_size=FAF_LARGE_SELECTED_ICON_SIZE, create_border_inwards=True))
 
     smd_icon = corners_blue_border.combine_pixel_map(square_big, "center")
     smd_icon = smd_icon.combine_pixel_map(antimissile_symbol_outlined, "center", name="icon_structure[T]_antimissile")

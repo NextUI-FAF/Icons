@@ -157,3 +157,42 @@ def save_dxt5_dds(
                             block.append(transparent)
                 f.write(_encode_dxt5_alpha_block(block))
                 f.write(_encode_dxt_color_block(block))
+
+
+def save_argb8888_dds(
+    output_file: str | Path,
+    width: int,
+    height: int,
+    pixels: tuple[tuple[RGBA, ...], ...],
+) -> None:
+    """Save an uncompressed 32-bit DDS with BGRA byte ordering."""
+    output_file = Path(output_file)
+    pitch = width * 4
+
+    with open(output_file, "wb") as f:
+        f.write(b"DDS ")
+        f.write(struct.pack("<I", 124))
+        f.write(struct.pack("<I", 0x0000100F))  # caps, height, width, pitch, pixel format
+        f.write(struct.pack("<I", height))
+        f.write(struct.pack("<I", width))
+        f.write(struct.pack("<I", pitch))
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<11I", *([0] * 11)))
+        f.write(struct.pack("<I", 32))
+        f.write(struct.pack("<I", 0x00000041))  # DDPF_RGB | DDPF_ALPHAPIXELS
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<I", 32))
+        f.write(struct.pack("<I", 0x00FF0000))
+        f.write(struct.pack("<I", 0x0000FF00))
+        f.write(struct.pack("<I", 0x000000FF))
+        f.write(struct.pack("<I", 0xFF000000))
+        f.write(struct.pack("<I", 0x00001000))
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<I", 0))
+        f.write(struct.pack("<I", 0))
+
+        for row in pixels:
+            for red, green, blue, alpha in row:
+                f.write(bytes((blue, green, red, alpha)))

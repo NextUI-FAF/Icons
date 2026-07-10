@@ -1,7 +1,7 @@
 from typing import Iterable
 from dataclasses import dataclass
 from colors import *
-from dds import save_dxt5_dds
+from dds import save_argb8888_dds, save_dxt5_dds
 from PIL import Image
 from pathlib import Path
 
@@ -312,12 +312,21 @@ class PixelMap:
         filename: str | None = None,
         output_path: str | Path | None = None,
         format: str = "DDS",
+        compression: str = "DXT5",
     ) -> None:
         output_file = self._resolve_output_file(filename, output_path, ".dds")
         image = self._to_image()
 
         if format.upper() == "DDS":
-            save_dxt5_dds(output_file, self.width, self.height, self.pixels, TRANSPARENT)
+            normalized_compression = compression.upper()
+            if normalized_compression == "DXT5":
+                save_dxt5_dds(output_file, self.width, self.height, self.pixels, TRANSPARENT)
+            elif normalized_compression in {"ARGB8888", "NONE", "UNCOMPRESSED"}:
+                save_argb8888_dds(output_file, self.width, self.height, self.pixels)
+            else:
+                raise ValueError(
+                    f"Unsupported DDS compression {compression!r}; expected DXT5 or ARGB8888"
+                )
         else:
             image.save(output_file, format=format)
 
@@ -344,9 +353,14 @@ def generate_previews(
         pixel_map.generate_preview(preview_path=preview_path, scale=scale)
 
 
-def export_pixel_maps(pixel_maps: list[PixelMap], output_path: str | Path) -> None:
+def export_pixel_maps(
+    pixel_maps: list[PixelMap],
+    output_path: str | Path,
+    *,
+    compression: str = "DXT5",
+) -> None:
     for pixel_map in pixel_maps:
-        pixel_map.export(output_path=output_path)
+        pixel_map.export(output_path=output_path, compression=compression)
 
 def combine_pixel_maps(
     pixel_maps: list[PixelMap],

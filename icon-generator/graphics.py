@@ -167,20 +167,11 @@ directfire_symbol = PixelMap.from_text(
        A A X A A
        X X A X X
        X X A X X""",
-    colors={"A": red},
+    colors={"A": black},
     name="directfire",
 )
 
-antiair_symbol = PixelMap.from_text(
-    """X X X X X
-       X A A A X
-       A X X X A
-       X X X X X
-       X X X X X""",
-    colors={"A": blue_cobalt_defense},
-    name="antiair",
-)
-antiair_symbol_outlined = antiair_symbol.outline(color=black, width=1)
+
 
 antiartillery_symbol = PixelMap.from_text(
     """X X X X X
@@ -302,12 +293,12 @@ wall_symbol = PixelMap.from_text(
 )
 
 antiair_symbol = PixelMap.from_text(
-    """X X X X X
-       X A A A X
+    """X X A X X
+       X A X A X
        A X X X A
        X X X X X
        X X X X X""",
-    colors={"A": amber_tactical},
+    colors={"A": lime_energy},
     name="antiair",
 )
 antiair_symbol_outlined = antiair_symbol.outline(color=black, width=1)
@@ -318,7 +309,7 @@ pgen_symbol = PixelMap.from_text(
        X A A A X
        X X A X X
        X X X A X""",
-    colors={"A": green_clear},
+    colors={"A": green_neon},
     name="pgen",
 )
 pgen_symbol_outlined = pgen_symbol.outline(color=black, width=1)
@@ -329,7 +320,7 @@ mex_symbol = PixelMap.from_text(
        A A X A A
        X X X X X
        X X A X X""",
-    colors={"A": green_tactical_olive},
+    colors={"A": mint_bright},
     name="mex",
 )
 mex_symbol_outlined = mex_symbol.outline(color=black, width=1)
@@ -340,7 +331,7 @@ intel_symbol = PixelMap.from_text(
        X A A A X
        X X X X X
        X X A X X""",
-    colors={"A": green_militar},
+    colors={"A": turquoise_bright},
     name="intel",
 )
 intel_symbol_outlined = intel_symbol.outline(color=black, width=1)
@@ -351,7 +342,7 @@ missile_symbol = PixelMap.from_text(
        X X A X X
        X X A X X
        X X A X X""",
-    colors={"A": green},
+    colors={"A": cyan_ice},
     name="missile",
 )
 missile_symbol_outlined = missile_symbol.outline(color=black, width=1)
@@ -362,7 +353,7 @@ sml_symbol = PixelMap.from_text(
        X X A X X
        X X A X X
        X X A X X""",
-    colors={"A": blue_tactical_navy},
+    colors={"A": blue_electric},
     name="sml",
 )
 sml_symbol_outlined = sml_symbol.outline(color=black, width=1)
@@ -373,7 +364,7 @@ antimissile_symbol = PixelMap.from_text(
        X X A X X
        X X X X X
        X X A X X""",
-    colors={"A": blue_cobalt_defense},
+    colors={"A": violet_energy},
     name="antimissile",
 )
 antimissile_symbol_outlined = antimissile_symbol.outline(color=black, width=1)
@@ -384,7 +375,7 @@ artillery_symbol = PixelMap.from_text(
        X A A A X
        X X A X X
        X X X X X""",
-    colors={"A": magenta},
+    colors={"A": pink_signal},
     name="artillery",
 )
 artillery_symbol_outlined = artillery_symbol.outline(color=black, width=1)
