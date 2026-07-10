@@ -74,15 +74,67 @@ class PixelMap:
             height,
             tuple(tuple(TRANSPARENT for _ in range(width)) for _ in range(height)),
         )
+    
+    def crop_border(self, amount: int) -> "PixelMap":
+        """
+        Elimina una orilla de 'amount' píxeles en todos los lados de la imagen.
+
+        Args:
+            amount: Número de píxeles a eliminar de cada borde.
+                    Debe ser >= 0 y menor que la mitad del ancho y alto.
+
+        Returns:
+            Una nueva PixelMap con las dimensiones reducidas.
+
+        Raises:
+            ValueError: Si amount es negativo o si el recorte resultante
+                        tendría dimensión cero o negativa.
+        """
+        if amount < 0:
+            raise ValueError("El valor de amount debe ser no negativo")
+        if amount * 2 >= self.width or amount * 2 >= self.height:
+            raise ValueError(
+                f"amount={amount} es demasiado grande para una imagen de {self.width}x{self.height}"
+            )
+
+        new_width = self.width - 2 * amount
+        new_height = self.height - 2 * amount
+
+        # Extraer la región interior
+        new_pixels = tuple(
+            tuple(self.pixels[y][x] for x in range(amount, amount + new_width))
+            for y in range(amount, amount + new_height)
+        )
+
+        # Conservar el nombre y el canvas_size (si existen)
+        return PixelMap(
+            new_width,
+            new_height,
+            new_pixels,
+            name=self.name,
+            canvas_size=self.canvas_size,
+        )
 
     def outline(self, width: int, color: str, create_inwards: bool = False) -> "PixelMap":
         if width < 1:
             return self
 
         outline_color = hex_to_rgba(color)
-        
-        if not create_inwards:
-            # Outline hacia afuera (expande el canvas)
+
+        if create_inwards:
+            # 1. Recortar la orilla (eliminar los bordes exteriores)
+            inner = self.crop_border(width)  # Asegúrate de tener este método
+            # 2. Expandir la imagen recortada con padding para que vuelva al tamaño original
+            expanded = inner.pad(width)
+            # 3. La máscara se construye a partir de la imagen recortada (desplazada por width)
+            mask = {
+                (x + width, y + width)
+                for y, row in enumerate(inner.pixels)
+                for x, pixel in enumerate(row)
+                if pixel[3] > 0
+            }
+        else:
+            # Caso normal: expandir la imagen original y usar su máscara
             expanded = self.pad(width)
             mask = {
                 (x + width, y + width)
@@ -90,51 +142,28 @@ class PixelMap:
                 for x, pixel in enumerate(row)
                 if pixel[3] > 0
             }
-            outlined = [list(row) for row in expanded.pixels]
 
-            for x, y in mask:
-                for outline_y in range(y - width, y + width + 1):
-                    for outline_x in range(x - width, x + width + 1):
-                        if (outline_x, outline_y) in mask:
-                            continue
-                        if not (0 <= outline_x < expanded.width and 0 <= outline_y < expanded.height):
-                            continue
-                        if outlined[outline_y][outline_x][3] == 0:
-                            outlined[outline_y][outline_x] = outline_color
+        # Convertir a lista mutable para pintar
+        outlined = [list(row) for row in expanded.pixels]
 
-            return PixelMap(expanded.width, expanded.height, tuple(tuple(row) for row in outlined), name=self.name, canvas_size=self.canvas_size)
-        else:
-            # Outline hacia adentro (pinta los bordes del icono)
-            canvas = [list(row) for row in self.pixels]
-            mask = {
-                (x, y)
-                for y, row in enumerate(self.pixels)
-                for x, pixel in enumerate(row)
-                if pixel[3] > 0
-            }
-            
-            # Encuentra píxeles del icono que están en los bordes (cercanos a transparencia)
-            edge_pixels = set()
-            for x, y in mask:
-                is_edge = False
-                for offset_y in range(-width, width + 1):
-                    for offset_x in range(-width, width + 1):
-                        check_x = x + offset_x
-                        check_y = y + offset_y
-                        if (check_x, check_y) not in mask:
-                            if 0 <= check_x < self.width and 0 <= check_y < self.height:
-                                is_edge = True
-                                break
-                    if is_edge:
-                        break
-                if is_edge:
-                    edge_pixels.add((x, y))
-            
-            # Pinta los píxeles del borde con el color del outline
-            for x, y in edge_pixels:
-                canvas[y][x] = outline_color
+        # Dibujar el borde alrededor de la máscara
+        for x, y in mask:
+            for outline_y in range(y - width, y + width + 1):
+                for outline_x in range(x - width, x + width + 1):
+                    if (outline_x, outline_y) in mask:
+                        continue
+                    if not (0 <= outline_x < expanded.width and 0 <= outline_y < expanded.height):
+                        continue
+                    if outlined[outline_y][outline_x][3] == 0:
+                        outlined[outline_y][outline_x] = outline_color
 
-            return PixelMap(self.width, self.height, tuple(tuple(row) for row in canvas), name=self.name, canvas_size=self.canvas_size)
+        return PixelMap(
+            expanded.width,
+            expanded.height,
+            tuple(tuple(row) for row in outlined),
+            name=self.name,
+            canvas_size=self.canvas_size,
+        )
 
     def pad(self, size: int) -> "PixelMap":
         padded = PixelMap.empty(self.width + size * 2, self.height + size * 2)

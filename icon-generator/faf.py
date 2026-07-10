@@ -57,13 +57,12 @@ def create_faf_icon_variants(
     techs: list[int],
     canvas_size: tuple[int, int] = FAF_ICON_SIZE,
     selected_canvas_size: tuple[int, int] = FAF_SELECTED_ICON_SIZE,
-    add_border: bool = True,
+    create_border_inwards: bool = False,
 ) -> list[PixelMap]:
     icon_states = []
-    create_border_inwards = not add_border
     
-    if add_border:
-        icon_states.append(icon.outline(1, black, create_inwards=add_border).add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
+    if not create_border_inwards:
+        icon_states.append(icon.outline(1, black).add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
     else:
         icon_states.append(icon.add_suffix_to_the_name("_rest").set_canvas_size(canvas_size))
     icon_states.append(icon.outline(1, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_over").set_canvas_size(canvas_size))
