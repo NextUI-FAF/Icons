@@ -1,4 +1,4 @@
-name = "NextUI Icons"
+name = "NextUI.Icons"
 uid = "b36f7a42-7d65-4b9b-a4f3-6b8e3f1c2d90"
 version = 1
 author = "wolfred"
