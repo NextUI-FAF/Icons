@@ -7,6 +7,9 @@ these files.
 
 <img width="1416" height="1944" alt="image" src="https://github.com/user-attachments/assets/1bebfcfd-f84e-4456-9b96-167444e3eac0" />
 
+The mod will also add an upgrade animation to all upgrading structures.
+
+<img width="11" height="9" alt="image" src="https://github.com/user-attachments/assets/5802c583-ef62-4e55-87b6-323fda437583" />
 
 ## Installation
 
