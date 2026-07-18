@@ -5,6 +5,9 @@ FAF UI mod: it owns the generated icon sets, blueprint-to-icon assignments, and
 the small upgrade-state overlays. NextUI itself does not need to ship or load
 these files.
 
+<img width="1416" height="1944" alt="image" src="https://github.com/user-attachments/assets/1bebfcfd-f84e-4456-9b96-167444e3eac0" />
+
+
 ## Installation
 
 Keep this repository in the FAF mods directory as `NextUI.Icons`, enable
