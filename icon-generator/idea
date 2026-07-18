@@ -1,0 +1,60 @@
+Si, yo tambien creo que crear eso seria lo mas acertado, y muy probablemente muchas de las cosas que has creado aqui te sirvan para crear esa otra herramienta, nada de inferencias y miles de escenarios raros.
+
+Se hace un workflow, y en cada paso se van anadiendo capaz hasta entregar los dds finales, por ejemplo:
+
+* se define un icono
+* se define una variacion, esta variacion puede recibir un icono base u otra variacion, al final son lo mismo, un mapa de bits, esta variacion no tiene por que llamarse tech ni estar hardcodeada a los terminos de faf, es simplemente una variacion, se le dan instrucciones, crea la capa, le dice el orden, y se combina en el orden indicada con el mapa de bits que recibio
+* Y asi seguimos, podemos definir otra variacion, como mencionamos anteriormente esta variacion puede recibir otra variacion en su input, al final de cuentas son mapas de bits, le decimos el orden en el que se debe aplicar esta variacion, y al final se combinan
+* y una vez que ya esten listos los mapas de bits ahora si ya se generan los archivos con el patron de naming que el usuario haya indicado.
+
+P{or cierto no se si estoy usando el termino mapa de bits de la manera adecuada, me refiero a esa informacion cruda con los pixeles y colores antes de componer el archivo final.
+
+Un ejemplo seria algo asi:
+
+bitmap \
+  --name square \
+  --pixel-map "...."
+
+bitmap \
+  --name mex \
+  --pixel-map "..."
+
+bitmap \
+  --name square_border_1px \
+  --pixel-map "..."
+
+bitmap \
+  --name square_border_2px \
+  --pixel-map " ..."
+
+bitmap \
+  --name tech1_indicator  \
+  --pixel-map " .."
+
+bitmap \
+  --name tech2_indicator \
+  --pixel-map "..."
+
+bitmap \
+  --name tech3_indicator \
+  --pixel-map "..."
+
+bitmap \
+    --name mex \
+    --bitmaps "square:$gray mex:$green" \ # no se si este sea el mejor mecanismo para colorear
+
+
+bitmaps \
+    --name mex_states \
+    --source mex \
+    --variations "none square_border_1px:$black square_border_2px:$gray square_border_2px:$gray"
+
+
+bitmaps \
+    --name mex_techs \
+    --source mex_states \
+    --variations "tech1_indicator:$white tech2_indicator:$white tech3_indicator:$white"
+
+create_icons \
+  --bitmaps mex_techs \
+  --naming # todavia no se como implementar la funcion de naming, tampoco se si deba ir aqui o deba ir desde los bitmaps
