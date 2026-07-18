@@ -24,6 +24,10 @@ Replace username... with your username.
 
 ## NEW: Editing and generating icons with Python
 
+First you need to install the requeriments by runing the following command:
+
+`pip install -r requeriments.txt`
+
 You can create your own icons by running:
 
 `python icon-generator/main.py`
