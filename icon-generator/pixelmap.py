@@ -1,7 +1,6 @@
 from math import ceil
-from collections.abc import Mapping
 from typing import Iterable, Literal
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from colors import *
 from dds import save_argb8888_dds, save_dxt5_dds
 from PIL import Image
@@ -13,14 +12,21 @@ class PixelPattern:
     width: int
     height: int
     points: tuple[tuple[str | None, ...], ...]
+    name: str
+    default_colors: tuple[tuple[str, str], ...] = ()
+    outlines: tuple[tuple[int, str, bool], ...] = ()
 
     @classmethod
     def from_text(
         cls,
         points: str,
         *,
+        name: str,
         transparent_tokens: Iterable[str] = ("X", ".", "_"),
+        **default_colors: str,
     ) -> "PixelPattern":
+        if not name.strip():
+            raise ValueError("A PixelPattern must have a non-empty name")
         rows = [
             [token.strip() for token in line.split()]
             for line in points.strip().splitlines()
@@ -38,38 +44,105 @@ class PixelPattern:
             tuple(None if token in transparent else token for token in row)
             for row in rows
         )
-        return cls(width, len(parsed_rows), parsed_rows)
+        pattern = cls(
+            width,
+            len(parsed_rows),
+            parsed_rows,
+            name=name,
+            default_colors=tuple(default_colors.items()),
+        )
+        pattern._validate_color_tokens(default_colors, allow_missing=True)
+        return pattern
 
     @classmethod
-    def fill(cls, width: int, height: int) -> "PixelPattern":
+    def fill(
+        cls,
+        width: int,
+        height: int,
+        *,
+        name: str,
+        A: str,
+    ) -> "PixelPattern":
         if width < 1 or height < 1:
             raise ValueError("Pixel pattern dimensions must be positive")
-        return cls(width, height, tuple(tuple("A" for _ in range(width)) for _ in range(height)))
+        return cls(
+            width,
+            height,
+            tuple(tuple("A" for _ in range(width)) for _ in range(height)),
+            name=name,
+            default_colors=(("A", A),),
+        )
 
-    def color(self, colors: Mapping[str, str], *, name: str) -> "PixelMap":
-        if not name.strip():
-            raise ValueError("A colored PixelMap must have a non-empty name")
-
-        required_tokens = {
+    @property
+    def color_tokens(self) -> tuple[str, ...]:
+        return tuple(sorted({
             token
             for row in self.points
             for token in row
             if token is not None
-        }
-        provided_tokens = set(colors)
-        missing = required_tokens - provided_tokens
-        unknown = provided_tokens - required_tokens
-        if missing:
-            raise ValueError(f"Missing colors for pattern tokens: {', '.join(sorted(missing))}")
+        }))
+
+    def _validate_color_tokens(
+        self,
+        colors: dict[str, str],
+        *,
+        allow_missing: bool,
+    ) -> None:
+        required = set(self.color_tokens)
+        provided = set(colors)
+        unknown = provided - required
         if unknown:
             raise ValueError(f"Unknown colors for pattern tokens: {', '.join(sorted(unknown))}")
+        missing = required - provided
+        if missing and not allow_missing:
+            raise ValueError(f"Missing colors for pattern tokens: {', '.join(sorted(missing))}")
+
+    def outline(
+        self,
+        width: int,
+        color: str,
+        create_inwards: bool = False,
+    ) -> "PixelPattern":
+        return replace(
+            self,
+            outlines=self.outlines + ((width, color, create_inwards),),
+        )
+
+    def __call__(
+        self,
+        *ordered_colors: str,
+        **named_colors: str,
+    ) -> "PixelMap":
+        required_tokens = self.color_tokens
+
+        if ordered_colors and named_colors:
+            raise ValueError("Use either positional colors or named colors, not both")
+
+        colors = dict(self.default_colors)
+        if ordered_colors:
+            if len(ordered_colors) > len(required_tokens):
+                raise ValueError(
+                    f"Pattern has {len(required_tokens)} color tokens, "
+                    f"but {len(ordered_colors)} positional colors were provided"
+                )
+            colors.update(zip(required_tokens, ordered_colors))
+        else:
+            colors.update(named_colors)
+
+        self._validate_color_tokens(colors, allow_missing=False)
 
         palette = {token: hex_to_rgba(color) for token, color in colors.items()}
         pixels = tuple(
             tuple(TRANSPARENT if token is None else palette[token] for token in row)
             for row in self.points
         )
-        return PixelMap(self.width, self.height, pixels, name=name)
+        pixel_map = PixelMap(self.width, self.height, pixels, name=self.name)
+        for width, color, create_inwards in self.outlines:
+            pixel_map = pixel_map.outline(width, color, create_inwards=create_inwards)
+        return pixel_map
+
+    def color(self, *ordered_colors: str, **named_colors: str) -> "PixelMap":
+        return self(*ordered_colors, **named_colors)
 
 
 @dataclass(frozen=True)
@@ -151,26 +224,63 @@ class PixelMap:
         outline_color = hex_to_rgba(color)
 
         if create_inwards:
-            # 1. Recortar la orilla (eliminar los bordes exteriores)
-            inner = self.crop_border(width)  # Asegúrate de tener este método
-            # 2. Expandir la imagen recortada con padding para que vuelva al tamaño original
-            expanded = inner.pad(width)
-            # 3. La máscara se construye a partir de la imagen recortada (desplazada por width)
-            mask = {
-                (x + width, y + width)
-                for y, row in enumerate(inner.pixels)
-                for x, pixel in enumerate(row)
-                if pixel[3] > 0
-            }
-        else:
-            # Caso normal: expandir la imagen original y usar su máscara
-            expanded = self.pad(width)
-            mask = {
-                (x + width, y + width)
+            transparent = {
+                (x, y)
                 for y, row in enumerate(self.pixels)
                 for x, pixel in enumerate(row)
-                if pixel[3] > 0
+                if pixel[3] == 0
             }
+            exterior = set()
+            pending = [
+                point
+                for point in transparent
+                if point[0] in {0, self.width - 1}
+                or point[1] in {0, self.height - 1}
+            ]
+            while pending:
+                point = pending.pop()
+                if point in exterior:
+                    continue
+                exterior.add(point)
+                x, y = point
+                for neighbor_y in range(y - 1, y + 2):
+                    for neighbor_x in range(x - 1, x + 2):
+                        neighbor = (neighbor_x, neighbor_y)
+                        if neighbor in transparent and neighbor not in exterior:
+                            pending.append(neighbor)
+
+            outlined = [list(row) for row in self.pixels]
+            for y, row in enumerate(self.pixels):
+                for x, pixel in enumerate(row):
+                    if pixel[3] == 0:
+                        continue
+                    touches_exterior = any(
+                        neighbor_x < 0
+                        or neighbor_x >= self.width
+                        or neighbor_y < 0
+                        or neighbor_y >= self.height
+                        or (neighbor_x, neighbor_y) in exterior
+                        for neighbor_y in range(y - width, y + width + 1)
+                        for neighbor_x in range(x - width, x + width + 1)
+                    )
+                    if touches_exterior:
+                        outlined[y][x] = outline_color
+
+            return PixelMap(
+                self.width,
+                self.height,
+                tuple(tuple(row) for row in outlined),
+                name=self.name,
+                canvas_size=self.canvas_size,
+            )
+
+        expanded = self.pad(width)
+        mask = {
+            (x + width, y + width)
+            for y, row in enumerate(self.pixels)
+            for x, pixel in enumerate(row)
+            if pixel[3] > 0
+        }
 
         # Convertir a lista mutable para pintar
         outlined = [list(row) for row in expanded.pixels]
@@ -247,12 +357,15 @@ class PixelMap:
 
     def combine_pixel_map(
         self,
-        pixel_map: "PixelMap",
+        pixel_map: "PixelMap | PixelPattern",
         position: tuple[int, int] | str,
         offset: tuple[int, int] = (0, 0),
         zindex: int = 0,
         name: str | None = None,
     ) -> "PixelMap":
+        if isinstance(pixel_map, PixelPattern):
+            pixel_map = pixel_map()
+
         if isinstance(position, str):
             if position == "center":
                 position_x = (self.width - pixel_map.width) // 2
@@ -479,7 +592,7 @@ def export_pixel_maps(
         pixel_map.export(output_path=output_path, compression=compression)
 
 def combine_pixel_maps(
-    pixel_maps: list[PixelMap],
+    pixel_maps: list[PixelMap | PixelPattern],
     position: tuple[int, int] | str = "center",
     offset: tuple[int, int] = (0, 0),
     name: str | None = None,
@@ -487,7 +600,8 @@ def combine_pixel_maps(
     if not pixel_maps:
         raise ValueError("Cannot combine an empty list of pixel maps")
 
-    combined = pixel_maps[0]
+    first = pixel_maps[0]
+    combined = first() if isinstance(first, PixelPattern) else first
     for pixel_map in pixel_maps[1:]:
         combined = combined.combine_pixel_map(pixel_map, position, offset=offset, zindex=1)
 

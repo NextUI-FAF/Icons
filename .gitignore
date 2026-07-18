@@ -1,4 +1,9 @@
 custom-strategic-icons/.strategic-icon-cache/
 custom-strategic-icons/original_icons/
 custom-strategic-icons/backup_rgba_*/
-
+icon-generator/original_icons
+custom-strategic-icons
+custom-strategic-icons2
+icon-generator/previews
+artwork
+icon-generator/__pycache__/

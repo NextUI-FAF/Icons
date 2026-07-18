@@ -1,15 +1,20 @@
 from pixelmap import PixelPattern
+from colors import *
 
 
 # Icon geometry ---------------------------------------------------------------
 
-square_pattern = PixelPattern.fill(9, 9)
+square = PixelPattern.fill(9, 9, name="square", A=player_color)
 
-square_big_pattern = PixelPattern.fill(11, 11)
+square_big = PixelPattern.fill(11, 11, name="square_big", A=player_color)
 
-rectangle_pattern = PixelPattern.fill(13, 7)
+rectangle = PixelPattern.fill(13, 7, name="rectangle", A=player_color)
 
-hexagon_pattern = PixelPattern.from_text(
+# rectange_with_crown = PixelPattern.from_text(
+#     """A A A A A A A A A A A A A"""
+# )
+
+hexagon = PixelPattern.from_text(
     """X X X A A A A A X X X
        X X A A A A A A A X X
        X A A A A A A A A A X
@@ -17,9 +22,10 @@ hexagon_pattern = PixelPattern.from_text(
        X A A A A A A A A A X
        X X A A A A A A A X X
        X X X A A A A A X X X""",
+    name="hexagon", A=player_color,
 )
 
-diamond_pattern = PixelPattern.from_text(
+diamond = PixelPattern.from_text(
     """X X X X A X X X X
        X X X A A A X X X
        X X A A A A A X X
@@ -29,9 +35,10 @@ diamond_pattern = PixelPattern.from_text(
        X X A A A A A X X
        X X X A A A X X X
        X X X X A X X X X""",
+    name="diamond", A=player_color,
 )
 
-triangle_pattern = PixelPattern.from_text(
+triangle = PixelPattern.from_text(
     """X X X X A X X X X
        X X X X A X X X X
        X X X A A A X X X
@@ -42,9 +49,10 @@ triangle_pattern = PixelPattern.from_text(
        X A A A A A A A X
        A A A A A A A A A
        A A A A A A A A A""",
+    name="triangle", A=player_color,
 )
 
-wide_triangle_pattern = PixelPattern.from_text(
+wide_triangle = PixelPattern.from_text(
     """X X X X X X A X X X X X X
        X X X X X A A A X X X X X
        X X X X A A A A A X X X X
@@ -52,9 +60,10 @@ wide_triangle_pattern = PixelPattern.from_text(
        X X A A A A A A A A A X X
        X A A A A A A A A A A A X
        A A A A A A A A A A A A A""",
+    name="wide_triangle", A=player_color,
 )
 
-trapezium_pattern = PixelPattern.from_text(
+trapezium = PixelPattern.from_text(
     """A A A A A A A A A A A
        A A A A A A A A A A A
        X A A A A A A A A A A
@@ -62,9 +71,10 @@ trapezium_pattern = PixelPattern.from_text(
        X A A A A A A A A A X
        X X A A A A A A A X X
        X X A A A A A A A X X""",
+    name="trapezium", A=player_color,
 )
 
-semicircle_pattern = PixelPattern.from_text(
+semicircle = PixelPattern.from_text(
     """X X X X X A X X X X X
        X X X A A A A A X X X
        X X A A A A A A A X X
@@ -73,9 +83,10 @@ semicircle_pattern = PixelPattern.from_text(
        A A A A A A A A A A A
        A A A A A A A A A A A
        A A A A A A A A A A A""",
+    name="semicircle", A=player_color,
 )
 
-inverted_semicircle_pattern = PixelPattern.from_text(
+inverted_semicircle = PixelPattern.from_text(
     """A A A A A A A A A A A
        A A A A A A A A A A A
        A A A A A A A A A A A
@@ -84,9 +95,10 @@ inverted_semicircle_pattern = PixelPattern.from_text(
        X X A A A A A A A X X
        X X X A A A A A X X X
        X X X X X A X X X X X""",
+    name="inverted_semicircle", A=player_color,
 )
 
-circle_pattern = PixelPattern.from_text(
+circle = PixelPattern.from_text(
     """X X X A A A X X X
        X X X A A A X X X
        X X A A A A A X X
@@ -97,250 +109,318 @@ circle_pattern = PixelPattern.from_text(
        X A A A A A A A X
        X X A A A A A X X
        X X X A A A X X X""",
+    name="circle", A=player_color,
 )
 
 
 # Global tech-level symbols ---------------------------------------------------
 
-t2_indicator_pattern = PixelPattern.from_text(
+t2_indicator = PixelPattern.from_text(
     """X B B B B B X
        X B A B A B X
        X B A B A B X
        X B B B B B X""",
+    name="tech2", A=white, B=black,
 )
 
-t3_indicator_pattern = PixelPattern.from_text(
+t3_indicator = PixelPattern.from_text(
     """B B B B B B B
        B A B A B A B
        B A B A B A B
        B B B B B B B""",
+    name="tech3", A=white, B=black,
 )
 
-diamond_t3_indicator_pattern = PixelPattern.from_text(
+diamond_t3_indicator = PixelPattern.from_text(
     """B X X X X X B
        B A X X X A B
        B A B X B A B
        B A B A B A B
        B B B B B B B""",
+    name="diamond_tech3", A=white, B=black,
 )
 
 
 # Reusable symbols ------------------------------------------------------------
 
-generic_symbol_pattern = PixelPattern.from_text(
+generic_symbol = PixelPattern.from_text(
     """X X X X X
        X X X X X
        X X X X X
        X X X X X
        X X X X X""",
+    name="generic_symbol",
 )
 
-directfire_symbol_pattern = PixelPattern.from_text(
+directfire_symbol = PixelPattern.from_text(
     """X X A X X
        X X A X X
        A A X A A
        X X A X X
        X X A X X""",
+    name="directfire", A=black,
 )
 
 
 
-antiartillery_symbol_pattern = PixelPattern.from_text(
+antiartillery_symbol = PixelPattern.from_text(
     """X X X X X
        X X A X X
        X A X A X
        X X A X X
        X X X X X""",
+    name="antiartillery", A=blue_cobalt_defense,
 )
 
-antinavy_symbol_pattern = PixelPattern.from_text(
+antinavy_symbol = PixelPattern.from_text(
     """X X X X X
        A A A A A
        X X X X X
        X X A X X
        X X A X X""",
+    name="antinavy", A=cyan,
 )
 
-antishield_symbol_pattern = PixelPattern.from_text(
+antishield_symbol = PixelPattern.from_text(
     """X X A X A X X
        X X X X X X X
        X A X X X A X
        A A X X X A A""",
+    name="antishield", A=magenta,
 )
 
-air_symbol_pattern = PixelPattern.from_text(
+crown_symbol = PixelPattern.from_text(
+    """A X A X A
+       X A A A X""",
+       name="crown", A=gold_bright,
+)
+crown_symbol_outlined = crown_symbol.outline(1, black)
+
+air_symbol = PixelPattern.from_text(
     """X X X X X
        X X A X X
        X A X A X
        A X X X A
        X X X X X""",
+    name="air", A=black,
 )
+air_symbol_outlined = air_symbol.outline(1, black)
 
-land_symbol_pattern = PixelPattern.from_text(
+
+air_factoryhq_symbol = PixelPattern.from_text(
+    """X X X X X X X X X X X
+       A X X X X A X X X X A
+       A X X X A X A X X X A
+       A X X A X X X A X X A
+       X X X X X X X X X X X""",
+    name="air", A=black,
+)
+air_factoryhq_symbol_outlined = air_factoryhq_symbol.outline(1, black)
+
+land_symbol = PixelPattern.from_text(
     """X X A X X
        X A X A X
        A X X X A
        X A X A X
        X X A X X""",
+    name="land", A=black,
+)
+land_symbol_outlined = land_symbol.outline(1, black)
+
+land_factoryhq_symbol = PixelPattern.from_text(
+    """X X X X A X X X X
+       A X X A X A X X A
+       A X A X X X A X A
+       A X X A X A X X A
+       X X X X A X X X X""",
+    name="land", A=black,
 )
 
-naval_symbol_pattern = PixelPattern.from_text(
+naval_factoryhq_symbol = PixelPattern.from_text(
+    """X X X X X X X X X
+       A X X X X X X X A
+       A X A X X X A X A
+       A X X A A A X X A
+       X X X X X X X X X""",
+    name="naval", A=black,
+)
+naval_factoryhq_symbol_outlined = naval_factoryhq_symbol.outline(1, black)
+
+naval_symbol = PixelPattern.from_text(
     """X X X X X
-       X X X X X
-       X X X X X
        A X X X A
-       X A A A X""",
+       X A A A X
+       X X X X X
+       X X X X X""",
+    name="naval", A=black,
 )
+naval_symbol_outlined = naval_symbol.outline(1, black)
 
-transport_symbol_pattern = PixelPattern.from_text(
+transport_symbol = PixelPattern.from_text(
     """A A A A A
        A X X X A
        A X X X A
        X X A X X
        X X A X X""",
+    name="transport", A=cyan_pale,
 )
 
-shield_symbol_pattern = PixelPattern.from_text(
+shield_symbol = PixelPattern.from_text(
     """X X X X X
        X A A A X
        A X X X A
        A X X X A
        A X X X A""",
+    name="shield", A=blue_cobalt_defense,
 )
 
-counterintel_symbol_pattern = PixelPattern.from_text(
+counterintel_symbol = PixelPattern.from_text(
     """A X A X A
        X X X X X
        X A X A X
        X X X X X
        X X A X X""",
+    name="counterintel", A=cyan,
 )
 
-engineer_symbol_pattern = PixelPattern.from_text(
+engineer_symbol = PixelPattern.from_text(
     """X X X X X
        A A A A A
        X X A X X
        X X A X X
        X X X X X""",
+    name="engineer", A=green,
 )
 
-bomb_symbol_pattern = PixelPattern.from_text(
+bomb_symbol = PixelPattern.from_text(
     """A X X X A
        X A X A X
        X X X X X
        X A X A X
        A X X X A""",
+    name="bomb", A=orange,
 )
 
-wall_symbol_pattern = PixelPattern.from_text(
+wall_symbol = PixelPattern.from_text(
     """A A A A A
        A X A X A
        A A A A A
        A X A X A
        A A A A A""",
+    name="wall", A=player_color,
 )
 
-antiair_symbol_pattern = PixelPattern.from_text(
+antiair_symbol = PixelPattern.from_text(
     """X X X X X
        X X A X X
        X A A A X
        A A X A A
        A X X X A""",
+    name="antiair", A=blue_light,
 )
 
-pgen_symbol_pattern = PixelPattern.from_text(
+pgen_symbol = PixelPattern.from_text(
     """X A X X X
        X X A X X
        X A A A X
        X X A X X
        X X X A X""",
+    name="pgen", A=yellow,
 )
 
-mex_symbol_pattern = PixelPattern.from_text(
+mex_symbol = PixelPattern.from_text(
     """X A A A X
        A X X X A
        A A X A A
        X X X X X
        X X A X X""",
+    name="mex", A=green_neon,
 )
 
-intel_symbol_pattern = PixelPattern.from_text(
+intel_symbol = PixelPattern.from_text(
     """A A A A A
        X X X X X
        X A A A X
        X X X X X
        X X A X X""",
+    name="intel", A=silver_bright,
 )
 
-missile_symbol_pattern = PixelPattern.from_text(
+missile_symbol = PixelPattern.from_text(
     """X X A X X
        X X A X X
        X X A X X
        X X A X X
        X X A X X""",
+    name="missile", A=peach_bright,
 )
 
-sml_symbol_pattern = PixelPattern.from_text(
+sml_symbol = PixelPattern.from_text(
     """X X A X X
        X X A X X
        X X A X X
        X X A X X
        X X A X X""",
+    name="sml", A=red_signal,
 )
 
-antimissile_symbol_pattern = PixelPattern.from_text(
+antimissile_symbol = PixelPattern.from_text(
     """X X A X X
        X X X X X
        X X A X X
        X X X X X
        X X A X X""",
+    name="antimissile", A=indigo_bright,
 )
 
-artillery_symbol_pattern = PixelPattern.from_text(
+artillery_symbol = PixelPattern.from_text(
     """X X X X X
        X X A X X
        X A A A X
        X X A X X
        X X X X X""",
+    name="artillery", A=red_orange,
 )
 
 # Reusable borders ------------------------------------------------------------
 
-square_border_corner_pattern = PixelPattern.from_text(
-    """B B B A A A A A A A B B B
-       B C C C C C C C C C C C B
-       B C X X X X X X X X X C B
-       A C X X X X X X X X X C A
-       A C X X X X X X X X X C A
-       A C X X X X X X X X X C A
-       A C X X X X X X X X X C A
-       A C X X X X X X X X X C A
-       A C X X X X X X X X X C A
+square_border_corner = PixelPattern.from_text(
+    """A A A B B B B B B B A A A
+       A C C C C C C C C C C C A
        A C X X X X X X X X X C A
        B C X X X X X X X X X C B
-       B C C C C C C C C C C C B
-       B B B A A A A A A A B B B""",
+       B C X X X X X X X X X C B
+       B C X X X X X X X X X C B
+       B C X X X X X X X X X C B
+       B C X X X X X X X X X C B
+       B C X X X X X X X X X C B
+       B C X X X X X X X X X C B
+       A C X X X X X X X X X C A
+       A C C C C C C C C C C C A
+       A A A C C C C C C C A A A""",
+    name="corners_border", A=yellow, B=black, C=black,
 )
 
-squarebig_border_corners_pattern = PixelPattern.from_text(
-    """B B B A A A A A A A A A B B B
-       B C C C C C C C C C C C C C B
-       B C X X X X X X X X X X X C B
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
-       A C X X X X X X X X X X X C A
+squarebig_border_corners = PixelPattern.from_text(
+    """A A A B B B B B B B B B A A A
+       A C C C C C C C C C C C C C A
        A C X X X X X X X X X X X C A
        B C X X X X X X X X X X X C B
-       B C C C C C C C C C C C C C B
-       B B B A A A A A A A A A B B B""",
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       B C X X X X X X X X X X X C B
+       A C X X X X X X X X X X X C A
+       A C C C C C C C C C C C C C A
+       A A A C C C C C C C C C A A A""",
+    name="corners_big_border", A=blue_electric, B=black, C=black,
 )
 
-squarebig_border_hazard_warning_pattern = PixelPattern.from_text(
+squarebig_border_hazard_warning = PixelPattern.from_text(
     """A A B B A A B B A A B B A A B
        A C C C C C C C C C C C C C B
        B C X X X X X X X X X X X C A
@@ -356,4 +436,93 @@ squarebig_border_hazard_warning_pattern = PixelPattern.from_text(
        A C X X X X X X X X X X X C B
        A C C C C C C C C C C C C C B
        B B A A B B A A B B A A B B A""",
+    name="hazard_warning_border", A=red_bright, B=black, C=black,
 )
+
+
+# Prepared pattern variants ---------------------------------------------------
+
+outlined_square = square.outline(width=1, color=black)
+antiair_symbol_outlined = antiair_symbol.outline(width=1, color=black)
+pgen_symbol_outlined = pgen_symbol.outline(width=1, color=black)
+mex_symbol_outlined = mex_symbol.outline(width=1, color=black)
+intel_symbol_outlined = intel_symbol.outline(width=1, color=black)
+missile_symbol_outlined = missile_symbol.outline(width=1, color=black)
+sml_symbol_outlined = sml_symbol.outline(width=1, color=black)
+antimissile_symbol_outlined = antimissile_symbol.outline(width=1, color=black)
+artillery_symbol_outlined = artillery_symbol.outline(width=1, color=black)
+
+# Full Icons
+
+commander_shape_original = PixelPattern.from_text(
+    """X X X X X X X X X X X X
+       X X X X X A A X X X X X
+       X X A A X A A X A A X X
+       X X A A A A A A A A X X
+       X X A X X A A X X A X X
+       X A A X A A A A X A A X
+       X A X X A X X A X X A X
+       X A X X A X X A X X A X
+       X X X A A X X A A X X X
+       X X X A A X X A A X X X
+       X X X A A X X A A X X X
+       X X X X X X X X X X X X""",
+    name="commander_shape",
+    A=player_color,
+)
+
+commander_shape_cybran = PixelPattern.from_text(
+    """X X X X A X X A X X X X
+       X X X X X A A X X X X X
+       X A X A X A A X A X A X
+       X X A A A A A A A A X X
+       X X A X X A A X X A X X
+       X A A X A A A A X A A X
+       X A X X A X X A X X A X
+       X A X X A X X A X X A X
+       X X X A A X X A A X X X
+       X X X A A X X A A X X X
+       X X X A A X X A A X X X
+       X X X X X X X X X X X X""",
+    name="commander_shape",
+    A=player_color,
+)
+
+commander_shape_seraphim = PixelPattern.from_text(
+    """X X X X X A X X X X X 
+       X X A X X A X X A X X  
+       X X A X A A A X A X X 
+       X X A A A A A A A X X  
+       X X A X X A X X A X X 
+       X X A X A A A X A A X 
+       X A A X A X A X X A X 
+       X A X X A X A X X A X 
+       X X X X A X A X X X X 
+       X X X A A X A A X X X 
+       X X A X A X A X A X X 
+       X X X X X X X X X X X """,
+    name="commander_shape_seraphim",
+    A=player_color,
+)
+
+commander_shape_aeon = PixelPattern.from_text(
+    """X X X X X X X X X X X 
+       X X X X A A A X X X X  
+       X X A X X A X X A X X 
+       X A A A A A A A A A X  
+       X X A X X A X X A X X 
+       X X A X A A A X A A X 
+       X A A X A X A X X A X 
+       X A X X A X A X X A X 
+       X X X X A X A X X X X 
+       X X X A A X A A X X X 
+       X X X A A X A A X X X 
+       X X X X X X X X X X X """,
+    name="commander_shape_aeon",
+    A=player_color,
+)
+
+commander_shape_aeon = commander_shape_aeon.outline(width=1, color=black).outline(width=1, color=green_neon).outline(width=1, color=black)
+commander_shape_uef = commander_shape_original.outline(width=1, color=black).outline(width=1, color=blue_cobalt_defense).outline(width=1, color=black)
+commander_shape_cybran = commander_shape_cybran.outline(width=1, color=black).outline(width=1, color=red_bright).outline(width=1, color=black)
+commander_shape_seraphim = commander_shape_seraphim.outline(width=1, color=black).outline(width=1, color=gold_bright).outline(width=1, color=black)

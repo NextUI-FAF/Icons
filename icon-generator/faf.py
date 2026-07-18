@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from collections.abc import Sequence
 from pathlib import Path
 from colors import (
     FAF_PLAYER_COLORS,
@@ -8,8 +9,8 @@ from colors import (
     white,
     slate_bright
 )
-from pixelmap import PixelMap, combine_pixel_maps, generate_previews, generate_pixelmap_preview_gallery
-from graphics import t2_indicator, t3_indicator
+from pixelmap import PixelMap, PixelPattern, combine_pixel_maps, generate_previews, generate_pixelmap_preview_gallery
+from pixel_patterns import t2_indicator, t3_indicator
 
 original_icons_dir = Path(__file__).with_name("original_icons")
 previews_dir = Path(__file__).with_name("previews")
@@ -79,12 +80,30 @@ def _remove_native_t1_marker(icon: PixelMap) -> PixelMap:
 
     return icon.erase_rect(0, marker_top, icon.width, icon.height - marker_top)
 
-def compose_faf_icon_with_variants(icons: list[PixelMap],
-                                   name: str,
-                                   techs: list[int],
-                                   border_inwards: bool = False,
-                                   canvas: FafCanvas = NORMAL_FAF_CANVAS,
-                                   ) -> list[PixelMap]:
+def _normalize_faf_canvas(
+    canvas: FafCanvas | Sequence[tuple[int, int]],
+) -> FafCanvas:
+    if isinstance(canvas, FafCanvas):
+        return canvas
+    if len(canvas) != 2:
+        raise ValueError("FAF canvas requires rest and selected sizes")
+
+    rest, selected = canvas
+    if len(rest) != 2 or len(selected) != 2:
+        raise ValueError("Each FAF canvas size must contain width and height")
+    if min(*rest, *selected) < 1:
+        raise ValueError("FAF canvas dimensions must be positive")
+    return FafCanvas(rest=tuple(rest), selected=tuple(selected))
+
+
+def compose_faf_icon_with_variants(
+    icons: list[PixelMap | PixelPattern],
+    name: str,
+    techs: list[int] | None = None,
+    border_inwards: bool = False,
+    canvas: FafCanvas | Sequence[tuple[int, int]] = NORMAL_FAF_CANVAS,
+) -> list[PixelMap]:
+    canvas = _normalize_faf_canvas(canvas)
     pixel_map = combine_pixel_maps(icons,  name=name)
     faf_icon_with_variants = generate_faf_icon_variants(
         pixel_map,
@@ -116,7 +135,7 @@ def export_faf_icons_with_variants(output_dir: Path) -> None:
 
 def generate_faf_icon_variants(
     icon: PixelMap,
-    techs: list[int],
+    techs: list[int] | None = None,
     canvas_size: tuple[int, int] = FAF_ICON_SIZE,
     selected_canvas_size: tuple[int, int] = FAF_SELECTED_ICON_SIZE,
     create_border_inwards: bool = False,
@@ -135,9 +154,12 @@ def generate_faf_icon_variants(
     icon_states.append(icon.outline(2, player_color, create_inwards=create_border_inwards).add_suffix_to_the_name("_selectedover").set_canvas_size(selected_canvas_size))
 
     variants = []
+    variant_techs: list[int | None] = [None] if techs is None else techs
     for icon_state in icon_states:
-        for tech in techs:
-            if tech == 1:
+        for tech in variant_techs:
+            if tech is None:
+                variant = icon_state
+            elif tech == 1:
                 variant = icon_state.replace_placeholder_in_the_name("[T]", "1")
             elif tech == 2:
                 variant = icon_state.combine_pixel_map(t2_indicator, "center-bottom", offset=(0, -1), zindex=-1).replace_placeholder_in_the_name("[T]", "2")
