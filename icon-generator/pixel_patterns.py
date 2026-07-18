@@ -158,7 +158,7 @@ directfire_symbol = PixelPattern.from_text(
        A A X A A
        X X A X X
        X X A X X""",
-    name="directfire", A=black,
+    name="directfire", A=red_orange,
 )
 
 
@@ -313,9 +313,9 @@ wall_symbol = PixelPattern.from_text(
 antiair_symbol = PixelPattern.from_text(
     """X X X X X
        X X A X X
-       X A A A X
-       A A X A A
-       A X X X A""",
+       X A X A X
+       A X X X A
+       X X X X X""",
     name="antiair", A=blue_light,
 )
 
@@ -451,6 +451,7 @@ missile_symbol_outlined = missile_symbol.outline(width=1, color=black)
 sml_symbol_outlined = sml_symbol.outline(width=1, color=black)
 antimissile_symbol_outlined = antimissile_symbol.outline(width=1, color=black)
 artillery_symbol_outlined = artillery_symbol.outline(width=1, color=black)
+directfire_symbol_outlined = directfire_symbol.outline(width=1, color=black)
 
 # Full Icons
 
@@ -493,9 +494,9 @@ commander_shape_seraphim = PixelPattern.from_text(
        X X A X X A X X A X X  
        X X A X A A A X A X X 
        X X A A A A A A A X X  
-       X X A X X A X X A X X 
-       X X A X A A A X A A X 
-       X A A X A X A X X A X 
+       X X A X A A A X A X X 
+       X X A X X A X X A A X 
+       X A A X A A A X X A X 
        X A X X A X A X X A X 
        X X X X A X A X X X X 
        X X X A A X A A X X X 
@@ -522,7 +523,7 @@ commander_shape_aeon = PixelPattern.from_text(
     A=player_color,
 )
 
-commander_shape_aeon = commander_shape_aeon.outline(width=1, color=black).outline(width=1, color=green_neon).outline(width=1, color=black)
-commander_shape_uef = commander_shape_original.outline(width=1, color=black).outline(width=1, color=blue_cobalt_defense).outline(width=1, color=black)
-commander_shape_cybran = commander_shape_cybran.outline(width=1, color=black).outline(width=1, color=red_bright).outline(width=1, color=black)
-commander_shape_seraphim = commander_shape_seraphim.outline(width=1, color=black).outline(width=1, color=gold_bright).outline(width=1, color=black)
+commander_shape_aeon = commander_shape_aeon.outline(width=1, color=black).outline(width=1, color=player_color).outline(width=1, color=black)
+commander_shape_uef = commander_shape_original.outline(width=1, color=black).outline(width=1, color=player_color).outline(width=1, color=black)
+commander_shape_cybran = commander_shape_cybran.outline(width=1, color=black).outline(width=1, color=player_color).outline(width=1, color=black)
+commander_shape_seraphim = commander_shape_seraphim.outline(width=1, color=black).outline(width=1, color=player_color).outline(width=1, color=black)
