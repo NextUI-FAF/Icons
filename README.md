@@ -2,8 +2,7 @@
 
 NextUI Icons is the strategic-icon companion mod for NextUI. It is a separate
 FAF UI mod: it owns the generated icon sets, blueprint-to-icon assignments, and
-the small upgrade-state overlays. NextUI itself does not need to ship or load
-these files.
+the small upgrade-state overlays.
 
 <img width="1416" height="1944" alt="image" src="https://github.com/user-attachments/assets/1bebfcfd-f84e-4456-9b96-167444e3eac0" />
 
