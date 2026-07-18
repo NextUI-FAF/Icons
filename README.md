@@ -7,16 +7,36 @@ these files.
 
 ## Installation
 
-Keep this repository in the FAF mods directory as `NextUI-Icons`, enable
+Keep this repository in the FAF mods directory as `NextUI.Icons`, enable
 **NextUI Icons** in the UI Mods menu, and restart the game after installing or
 updating it. The mod uses its own UID and can be enabled independently of
 NextUI.
 
-Do not leave a `custom-strategic-icons` directory in the main NextUI mod after
-migrating the assets. FAF treats any mod with that directory as an icon mod and
-will try to load its `mod_icons.lua`.
+Mods Directory:
+Linux: `/home/username/My Games/Gas Powered Games/Supreme Commander Forged Alliance/mods`
 
-## Editing and generating icons
+Replace username... with your username.
+
+## NEW: Editing and generating icons with Python
+
+You can create your own icons by running:
+
+`python icon-generator/main.py`
+
+To define new icons or to modify existing icons you should edit `icon-generator/main.py`.
+
+Chinging icon colors is easy as:
+    `compose_faf_icon_with_variants([square, pgen_symbol_outlined(pink_signal)], "icon_structure[T]_energy", [2, 3])`
+
+As you can see you only need to specify the argument with parentheses `pgen_symbol_outlined(pink_signal)`
+
+To add new pixel patterns modify `icon-generator/pixel_patterns.py`.
+
+At pixel_patterns you can find all the pixel patterns that are used to generate icons, you can use them to generate new icons or to modify existing ones. 
+
+Apart from that you dont need to modify anything else to work with the icon generator..
+
+## OLD: Editing and generating icons with bash
 
 `tools/strategic_icon_config.sh` is the user-facing recipe file.
 `tools/generate_strategic_icons.sh` is the generator entry point. Its internal
@@ -81,3 +101,18 @@ Use `--target-categories` when every listed blueprint category must match, or
 `--target-icon-names` for exact FAF `StrategicIconName` values. The selected
 tech must also be present in `--techs`. `mod_icons.lua` is generated from these
 targets; do not edit it manually.
+
+## Strategic icon draw order
+
+FAF uses `StrategicIconSortPriority` on unit blueprints to decide which
+strategic icons draw above others. Lower values draw above higher values:
+
+```text
+0   highest priority
+255 lowest priority
+```
+
+Edit `strategic_icon_priorities.lua` to raise specific icon families. The
+default rules raise TML, SML, SMD, and T3 artillery so they remain visible over
+lower-priority economy and structure icons. Rules can match by tech, categories,
+exact FAF `StrategicIconName`, and excluded blueprint IDs.
