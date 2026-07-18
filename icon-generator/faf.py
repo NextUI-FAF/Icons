@@ -115,7 +115,7 @@ def compose_faf_icon_with_variants(
     composed_faf_icons.extend(faf_icon_with_variants)
     return faf_icon_with_variants
 
-def generate_faf_icons_previews(output_dir: Path = previews_dir, preview_gallery_background_color="#303030") -> None:
+def generate_faf_icons_previews(output_dir: Path = previews_dir, preview_gallery_background_color="#303030", horizontal_spacing = 6, vertical_spacing=8) -> None:
     generate_previews(composed_faf_icons, output_dir)
     colored_icon_columns = len(composed_faf_rest_colored_icons) // player_colors_quantity
     generate_pixelmap_preview_gallery(
@@ -125,8 +125,8 @@ def generate_faf_icons_previews(output_dir: Path = previews_dir, preview_gallery
         columns=colored_icon_columns,
         arrange="top-to-bottom",
         background_color=preview_gallery_background_color,
-        vertical_spacing=8,
-        horizontal_spacing=6
+        vertical_spacing=vertical_spacing,
+        horizontal_spacing=horizontal_spacing
     )
 
 def export_faf_icons_with_variants(output_dir: Path) -> None:
